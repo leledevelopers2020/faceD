@@ -41,14 +41,14 @@ public class Camera extends AppCompatActivity {
     private CameraSource cameraSource;
     private SurfaceHolder surfaceHolder;
     private FaceDetector detector;
-    private TextView clickButton;
+    //private TextView clickButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
         surfaceView = findViewById(R.id.surfaceView);
-        clickButton = findViewById(R.id.tv_capture);
+        ///clickButton = findViewById(R.id.tv_capture);
 
         detector = new FaceDetector.Builder(this)
                 .setProminentFaceOnly(true) // optimize for single, relatively large face
@@ -139,6 +139,8 @@ public class Camera extends AppCompatActivity {
             });
         }
     }
+
+
     public Bitmap resizeBitmap(Bitmap getBitmap, int maxSize) {
         int width = getBitmap.getWidth();
         int height = getBitmap.getHeight();

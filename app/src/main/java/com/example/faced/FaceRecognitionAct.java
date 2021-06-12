@@ -62,37 +62,18 @@ import java.util.List;
 
 public class FaceRecognitionAct extends AppCompatActivity {
 
-    protected Interpreter tflite;
-    protected int imageSizeX;
-    protected int imageSizeY;
-
-    private static final float IMAGE_MEAN = 0.0f;
-    private static final float IMAGE_STD = 1.0f;
-    private static final int CAMERA_PERM_CODE = 101;
-
-    public Bitmap oriBitmap = null, textBitmap;
-    public static Bitmap cropped;
-    Uri imageUri;
-
-    float[][] ori_embedding = null;
-    float[][] test_embedding = null;
+    public Bitmap oriBitmap = null;
 
     private ImageView originalImage, testImage, randomImage;
     private Button verify, next;
     private TextView resultText;
 
-    SharedPreferences sharedPreferences;
     ArrayList<String> imageFiles;// list of file paths
     ArrayList<Double> listMeasures;
     ArrayList<Bitmap> allImagesBitmaps;
     String currentPhotoPath;
-    File photoFile = null;
-    boolean hasFace;
     byte[] convertedByteArray;
     File file;
-
-    int state = 0;
-    int i = 0;
 
     FaceReconImp faceReconImp;
 

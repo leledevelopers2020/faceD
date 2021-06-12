@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        detector.release();
+      //  detector.release();
     }
 
    /* @Override
@@ -234,4 +234,6 @@ public class MainActivity extends AppCompatActivity {
         super.onPostResume();
         startCamera();
     }*/
+
+
 }

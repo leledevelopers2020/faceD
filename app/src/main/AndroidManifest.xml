@@ -13,21 +13,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FaceD">
-        <activity android:name=".FaceRecognitionAct"></activity>
-        <activity android:name=".Camera" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity2">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".FaceRecognitionAct" />
+        <activity android:name=".Camera" />
+        <activity android:name=".MainActivity">
+
+        </activity>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.faced.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true"
-
             tools:replace="android:authorities">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
