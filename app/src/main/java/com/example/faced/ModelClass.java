@@ -9,12 +9,8 @@ import java.util.List;
 
 public class ModelClass {
     static private List<File> listFile;
-
     static Activity activity;
-
     static ImageView imageView;
-
-
 
     public static List<File> getListFile() {
         return listFile;
@@ -36,11 +32,11 @@ public class ModelClass {
         ModelClass.activity = activity;
     }
 
-    public  View getImageView() {
+    public View getImageView() {
         return ModelClass.imageView;
     }
 
-    public  void setImageView(ImageView imageView) {
+    public void setImageView(ImageView imageView) {
         ModelClass.imageView = imageView;
     }
 }

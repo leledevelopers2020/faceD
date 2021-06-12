@@ -4,13 +4,9 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -20,7 +16,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -32,7 +27,6 @@ import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
-import com.google.android.gms.vision.face.Landmark;
 import com.google.android.gms.vision.face.LargestFaceFocusingProcessor;
 
 import java.io.File;
@@ -114,7 +108,7 @@ public class CameraAPI {
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this.activity);
         alertBuilder.setCancelable(true);
         alertBuilder.setTitle("Permission Required");
-        alertBuilder.setMessage("Camea permission is required to move forward.");
+        alertBuilder.setMessage("Camera permission is required to move forward.");
         alertBuilder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 requestPermissions(permissions);
@@ -141,7 +135,6 @@ public class CameraAPI {
             public void surfaceCreated(SurfaceHolder holder) {
                 try {
                     if (ActivityCompat.checkSelfPermission(activity.getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
                         //    ActivityCompat#requestPermissions
                         // here to request the missing permissions, and then overriding
                         //   public void onRequestPermissionsResult(int requestCode, String[] permissions,

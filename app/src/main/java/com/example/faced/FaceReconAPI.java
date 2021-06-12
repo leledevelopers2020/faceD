@@ -20,7 +20,6 @@ public class FaceReconAPI {
 
     private static FaceReconAPI faceReconAPI=null;
     FaceReconImp faceReconImp = new FaceReconImp();
-    //ArrayList<String> imageFiles;// list of file paths
     ArrayList<Bitmap> allImagesBitmaps;
     public Bitmap oriBitmap;
     byte[] convertedByteArray;
@@ -31,10 +30,6 @@ public class FaceReconAPI {
         if (faceReconAPI == null)
             faceReconAPI = new FaceReconAPI();
         return faceReconAPI;
-    }
-
-    public Bitmap getOriBitmap() {
-        return oriBitmap;
     }
 
     public void setOriBitmap(Bitmap oriBitmap) {

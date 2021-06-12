@@ -1,26 +1,18 @@
 package com.example.faced;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.util.Log;
-import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.google.android.gms.vision.CameraSource;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.vision.face.FaceDetector;
-
-import static android.Manifest.permission.CAMERA;
 
 public class MainActivity2 extends AppCompatActivity {
     ImageView imageView;
-    private String[] neededPermissions = new String[]{CAMERA};
     private SurfaceView surfaceView;
-    private CameraSource cameraSource;
-    private SurfaceHolder surfaceHolder;
     private FaceDetector detector;
     CameraAPI cameraAPI;
     FaceReconAPI faceReconAPI;
@@ -39,7 +31,7 @@ public class MainActivity2 extends AppCompatActivity {
         cameraAPI.loadDetector(getApplicationContext());
         detector = cameraAPI.getDetector();
         faceReconAPI.loadFaceReconSetup();
-        Log.v("info ","faceReconAPI in MainActivity---> "+faceReconAPI.toString());
+        Log.v("info ", "faceReconAPI in MainActivity---> " + faceReconAPI.toString());
     }
 
 
