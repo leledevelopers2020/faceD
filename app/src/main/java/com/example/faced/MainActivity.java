@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.vision.face.FaceDetector;
 
-public class MainActivity2 extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
     ImageView imageView;
     private SurfaceView surfaceView;
     private FaceDetector detector;
@@ -20,14 +20,14 @@ public class MainActivity2 extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
+        setContentView(R.layout.activity_main);
         surfaceView = findViewById(R.id.surfaceView);
         imageView = findViewById(R.id.iv_picture);
-        cameraAPI = new CameraAPI(MainActivity2.this);
+        cameraAPI = new CameraAPI(MainActivity.this);
         faceReconAPI = FaceReconAPI.getFaceReconAPI();
         cameraAPI.setSurfaceView(surfaceView);
         ModelClass.imageView = imageView;
-        ModelClass.activity = MainActivity2.this;
+        ModelClass.activity = MainActivity.this;
         cameraAPI.loadDetector(getApplicationContext());
         detector = cameraAPI.getDetector();
         faceReconAPI.loadFaceReconSetup();
