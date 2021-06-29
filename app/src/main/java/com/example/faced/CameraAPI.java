@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Base64;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
@@ -29,7 +30,13 @@ import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 import com.google.android.gms.vision.face.LargestFaceFocusingProcessor;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,7 +45,7 @@ import java.util.List;
 import static android.Manifest.permission.CAMERA;
 
 public class CameraAPI {
-    private CameraAPIListener listener;
+    //private CameraAPIListener listener;
     private SurfaceView surfaceView;
     private CameraSource cameraSource;
     private SurfaceHolder surfaceHolder;
@@ -47,13 +54,24 @@ public class CameraAPI {
     Activity activity;
     ModelClass modelClass;
     FaceReconAPI faceReconAPI = FaceReconAPI.getFaceReconAPI();
+    private static CameraAPI cameraAPI = null;
+    private Bitmap currentBitmap;
 
-    public CameraAPI(Activity activity) {
+    private CameraAPI(){}
+
+    private CameraAPI(Activity activity) {
         this.activity = activity;
     }
 
-    public void setImageView(ImageView imageView) {
-        modelClass.setImageView(imageView);
+    public static CameraAPI getCameraAPI() {
+        if(cameraAPI == null){
+            cameraAPI = new CameraAPI();
+        }
+        return cameraAPI;
+    }
+
+    public void setActivity(Activity activity) {
+        this.activity = activity;
     }
 
     public SurfaceView getSurfaceView() {
@@ -64,8 +82,12 @@ public class CameraAPI {
         this.surfaceView = surfaceView;
     }
 
-    public void setListener(CameraAPIListener listener) {
-        this.listener = listener;
+    public Bitmap getCurrentBitmap() {
+        return currentBitmap;
+    }
+
+    public void setCurrentBitmap(Bitmap currentBitmap) {
+        this.currentBitmap = currentBitmap;
     }
 
     public FaceDetector getDetector() {
@@ -164,7 +186,7 @@ public class CameraAPI {
     }
 
 
-    public void captureImage() {
+    public void captureImage(int delayMillis) {
         final Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
             @Override
@@ -173,7 +195,7 @@ public class CameraAPI {
                 ModelClass.imageView.setVisibility(View.GONE);
                 clickImage();
             }
-        }, 3000);
+        }, delayMillis);
     }
 
 
@@ -184,6 +206,7 @@ public class CameraAPI {
                 public void onPictureTaken(byte[] bytes) {
                     Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                     try {
+                        setCurrentBitmap(bitmap);
                         processCameraPicture(bitmap);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -204,23 +227,24 @@ public class CameraAPI {
                 Log.d("info no faces", "no of faces = " + faces.size());
                 Toast.makeText(activity.getApplicationContext(),
                         "Scan Failed: Found nothing to scan",Toast.LENGTH_LONG).show();
-                        captureImage();
+                        captureImage(3000);
             } else {
                 Log.d("info faces", "no of faces = " + faces.size());
-                loadImagesFromDir();
+                loadImagesFromDir(bitmap);
                 //ModelClass.imageView.setImageBitmap(bitmap);
                 ModelClass.imageView.setVisibility(View.VISIBLE);
                 Log.v("info ","faceReconAPI in CameraApi---> "+faceReconAPI.toString());
-                faceReconAPI.setOriBitmap(bitmap);
-                faceReconAPI.recongize(bitmap);
+                //faceReconAPI.setOriBitmap(bitmap);
+                //faceReconAPI.recongize(bitmap);
                }
         } else {
             Log.d("info detector ", "Could not set up the detector!");
         }
     }
 
-    synchronized private void loadImagesFromDir() {
-        File path = activity.getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+    synchronized private void loadImagesFromDir(Bitmap bitmap) {
+        //File path = activity.getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File path = activity.getApplicationContext().getExternalFilesDir("text/plain");
         if (path.exists()) {
             ModelClass.setListFile(Arrays.asList(path.listFiles()));
             List<File> files = ModelClass.getListFile();
@@ -228,7 +252,13 @@ public class CameraAPI {
             if(ModelClass.getListFile().size()==0){
                 Toast.makeText(ModelClass.getActivity().getApplicationContext(),"No Images are found" +
                         " to compare. Please take a new picture",Toast.LENGTH_LONG).show();
-                captureImage();
+                //captureImage(3000);
+                faceReconAPI.doYouWantToRegister();
+
+            } else
+            {
+                faceReconAPI.setOriBitmap(bitmap);
+                faceReconAPI.recongize(bitmap);
             }
         }else {
             Log.v("info ", path.getAbsolutePath()+ " not found");
@@ -236,13 +266,57 @@ public class CameraAPI {
 
     }
 
-    public interface  CameraAPIListener{
+
+    private void getFiles() {
+
+        File path = ModelClass.getActivity().getApplicationContext().getExternalFilesDir("text/plain");
+        if (path.exists()) {
+            FileReader fileReader =null;
+            BufferedReader bufferedReader = null;
+            List<Details> details = new ArrayList<Details>();
+            List<File> files = Arrays.asList(path.listFiles());
+            for(int i=0;i<files.size();i++){
+                StringBuffer stringBuffer = new StringBuffer();
+                String line = "";
+                try {
+                    fileReader = new FileReader(files.get(i).getAbsolutePath());
+                    bufferedReader = new BufferedReader(fileReader);
+                    while ((line=bufferedReader.readLine()) != null){
+                        stringBuffer.append(line);
+                    }
+                    String data = stringBuffer.toString().replace("Data ","");
+                    bufferedReader.close();
+                    details.add(new Details(new JSONObject(data)));
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    System.out.println(e.getMessage());
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                    System.out.println(e.getMessage());
+                }
+            }
+
+        }else {
+            Log.v("info ", path.getAbsolutePath()+ " not found");
+        }
+    }
+
+    public Bitmap getBitMapFromString(String base64Str) throws IllegalArgumentException {
+        byte[] decodedBytes = Base64.decode(
+                base64Str.substring(base64Str.indexOf(",") + 1),
+                Base64.DEFAULT        );
+        return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+    }
+
+
+    /*public interface  CameraAPIListener{
         public void loadCamera();
     }
 
     public void startCamera() {
         if (listener != null)
             listener.loadCamera();
-    }
+    }*/
 
 }

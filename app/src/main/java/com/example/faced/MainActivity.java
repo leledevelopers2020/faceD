@@ -23,7 +23,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         surfaceView = findViewById(R.id.surfaceView);
         imageView = findViewById(R.id.iv_picture);
-        cameraAPI = new CameraAPI(MainActivity.this);
+        cameraAPI = CameraAPI.getCameraAPI();
+        cameraAPI.setActivity(MainActivity.this);
         faceReconAPI = FaceReconAPI.getFaceReconAPI();
         cameraAPI.setSurfaceView(surfaceView);
         ModelClass.imageView = imageView;
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.v("info ", "loadPermissions success");
                     findViewById(R.id.surfaceView).setVisibility(View.VISIBLE);
                     cameraAPI.setupSurfaceHolder();
-                    cameraAPI.captureImage();
+                    cameraAPI.captureImage(3000);
                 } else {
                     Log.v("info ", "loadPermissions failed");
                     //loadPermissions();

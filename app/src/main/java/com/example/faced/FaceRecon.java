@@ -12,7 +12,7 @@ public interface FaceRecon {
 
     public MappedByteBuffer loadmodelFile(Context context) throws IOException;
 
-    public void face_detector(final Bitmap bitmap, final String imagetype);
+    public void face_detector(final Bitmap bitmap, final String imagetype,int imageIndex);
 
-    public void get_embaddings(Bitmap bitmap, String imagetype);
+    public void get_embaddings(Bitmap bitmap, String imagetype,int imageIndex);
 }

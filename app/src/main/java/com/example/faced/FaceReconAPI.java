@@ -3,26 +3,36 @@ package com.example.faced;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 public class FaceReconAPI {
 
     private static FaceReconAPI faceReconAPI=null;
+    private static String result;
     FaceReconImp faceReconImp = new FaceReconImp();
-    ArrayList<Bitmap> allImagesBitmaps;
+    ArrayList<Details> allImagesBitmaps;
     public Bitmap oriBitmap;
     byte[] convertedByteArray;
+    static List<UserDetails> userDetails = new ArrayList<>();
 
     private FaceReconAPI() { }
 
@@ -41,13 +51,41 @@ public class FaceReconAPI {
     }
 
     public void recongize(Bitmap bitmap) {
-        allImagesBitmaps = new ArrayList<Bitmap>();
-        faceReconImp.face_detector(bitmap, "original");
-        convertedByteArray = convertBitmapToByteArray(oriBitmap);
-        arrayToFile(convertedByteArray);
+        allImagesBitmaps = new ArrayList<Details>();
+        faceReconImp.face_detector(bitmap, "original",-1);
+        //saving image
+        //convertedByteArray = convertBitmapToByteArray(oriBitmap);
+        //arrayToFile(convertedByteArray);
+        //saveJSONFile(null,null);
         if (ModelClass.getListFile().size() != 0) {
             loadAllImages();
         }
+    }
+
+    public void saveJSONFile(String name,String phoneNumber) {
+        FileOutputStream stream = null;
+        File jsonFile;
+        //String jsonFileName = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String jsonFileName = name;
+        File path = ModelClass.getActivity().getApplicationContext().getExternalFilesDir("text/plain");
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonFile = File.createTempFile(
+                    jsonFileName,  /* prefix */
+                    ".json",         /* suffix */
+                    path      /* directory */
+            );
+            jsonObject.put("imageBitmap",result);
+            jsonObject.put("name",name);
+            jsonObject.put("phoneNumber",phoneNumber);
+            stream = new FileOutputStream(jsonFile);
+            String data = "Data " + jsonObject.toString();
+            stream.write(data.getBytes());
+            stream.close();
+        } catch (JSONException | IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 
@@ -56,6 +94,9 @@ public class FaceReconAPI {
         try {
             baos = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+            //convert the bitmap into string
+            result=Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
+
             return baos.toByteArray();
         } finally {
             if (baos != null) {
@@ -81,9 +122,6 @@ public class FaceReconAPI {
             } else {
                 Log.v("info ", "unable to create file");
             }
-
-            Log.d("file path ab", "above file path" + file.getAbsolutePath());
-
         } catch (FileNotFoundException e) {
             System.out.println("File not found" + e);
         } catch (IOException ioe) {
@@ -104,13 +142,43 @@ public class FaceReconAPI {
 
     synchronized private void loadAllImages() {
         allImagesBitmaps.clear();
+        userDetails.clear();
+        FileReader fileReader =null;
+        BufferedReader bufferedReader = null;
+        //getFiles();
         List<File> files = ModelClass.getListFile();
         if (files != null && files.size() > 0) {
             for (int i = 0; i < files.size(); i++) {
                 String imageFile = files.get(i).getAbsolutePath();
                 Log.v("val iteration = ", (i + 1) + " = " + imageFile);
-                Bitmap bitmap = BitmapFactory.decodeFile(imageFile);
-                allImagesBitmaps.add(bitmap);
+                StringBuffer stringBuffer = new StringBuffer();
+                String line = "";
+                try {
+                    fileReader = new FileReader(files.get(i).getAbsolutePath());
+                    bufferedReader = new BufferedReader(fileReader);
+                    while ((line=bufferedReader.readLine()) != null){
+                        stringBuffer.append(line);
+                    }
+                    String data = stringBuffer.toString().replace("Data ","");
+                    bufferedReader.close();
+                    allImagesBitmaps.add(new Details(new JSONObject(data)));
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    System.out.println(e.getMessage());
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                    System.out.println(e.getMessage());
+                }
+                //Bitmap bitmap = BitmapFactory.decodeFile(imageFile);
+                //allImagesBitmaps.add(bitmap);
+                userDetails.add(new UserDetails(
+                        i,
+                        imageFile,
+                        getBitMapFromString(allImagesBitmaps.get(i).getImageBitmap()),
+                        allImagesBitmaps.get(i).getName(),
+                        allImagesBitmaps.get(i).getPhoneNumber()
+                ));
                 if (i == files.size() - 1) {
                     verifyImage();
                 }
@@ -123,7 +191,8 @@ public class FaceReconAPI {
         Log.v("info ","verifyImage");
         if (oriBitmap != null) {
             faceReconImp.setPreviousDistance(0.0);
-            faceReconImp.setNoOfMatchImage(0);
+            //faceReconImp.setNoOfMatchImage(0);
+            faceReconImp.setMatchingIndex(0);
             if (allImagesBitmaps.size() != 0) {
                 Log.v("info ","into verifyImage");
                 compareWithActualImage();
@@ -139,7 +208,7 @@ public class FaceReconAPI {
     synchronized private void compareWithActualImage() {
         Log.v("info ","compareWithActualImage");
         for (int j = 0; j < allImagesBitmaps.size(); j++) {
-            faceReconImp.face_detector(allImagesBitmaps.get(j), "test");
+            faceReconImp.face_detector(getBitMapFromString(allImagesBitmaps.get(j).getImageBitmap()), "test",j);
         }
     }
 
@@ -156,4 +225,51 @@ public class FaceReconAPI {
         );
         return image;
     }
+
+    private void getFiles() {
+
+        File path = ModelClass.getActivity().getApplicationContext().getExternalFilesDir("text/plain");
+        if (path.exists()) {
+            FileReader fileReader =null;
+            BufferedReader bufferedReader = null;
+            List<Details> details = new ArrayList<Details>();
+            List<File> files = Arrays.asList(path.listFiles());
+            for(int i=0;i<files.size();i++){
+                StringBuffer stringBuffer = new StringBuffer();
+                String line = "";
+                try {
+                    fileReader = new FileReader(files.get(i).getAbsolutePath());
+                    bufferedReader = new BufferedReader(fileReader);
+                    while ((line=bufferedReader.readLine()) != null){
+                        stringBuffer.append(line);
+                    }
+                    String data = stringBuffer.toString().replace("Data ","");
+                    bufferedReader.close();
+                    details.add(new Details(new JSONObject(data)));
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    System.out.println(e.getMessage());
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                    System.out.println(e.getMessage());
+                }
+            }
+
+        }else {
+            Log.v("info ", path.getAbsolutePath()+ " not found");
+        }
+    }
+
+    public Bitmap getBitMapFromString(String base64Str) throws IllegalArgumentException {
+        byte[] decodedBytes = Base64.decode(
+                base64Str.substring(base64Str.indexOf(",") + 1),
+                Base64.DEFAULT        );
+        return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+    }
+
+    public void doYouWantToRegister(){
+        new Assistant().startAssistant();
+    }
+
 }

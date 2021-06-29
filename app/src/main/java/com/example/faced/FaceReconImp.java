@@ -1,6 +1,7 @@
 package com.example.faced;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
@@ -42,15 +43,11 @@ public class FaceReconImp implements FaceRecon {
     static float[][] ori_embedding = null;
     float[][] test_embedding = null;
     private double previousDistance = 0.0;
-    private int noOfMatchImage = 0;
-    private Bitmap previousBitmap;
+    private int matchingIndex;
+    //private Bitmap previousBitmap;
 
     public FaceReconImp() {
         ori_embedding = new float[1][128];
-    }
-
-    public void setNoOfMatchImage(int noOfMatchImage) {
-        this.noOfMatchImage = noOfMatchImage;
     }
 
     @Override
@@ -75,7 +72,7 @@ public class FaceReconImp implements FaceRecon {
     }
 
     @Override
-    synchronized public void face_detector(Bitmap bitmap, String imagetype) {
+    synchronized public void face_detector(Bitmap bitmap, String imagetype,int imageIndex) {
         Log.v("val type = ", "image type bit" + bitmap);
         InputImage image = null;
         try {
@@ -113,7 +110,7 @@ public class FaceReconImp implements FaceRecon {
                                     Log.v("bound h: ", bounds.height() + "");
                                     cropped = Bitmap.createBitmap(bitmap, bounds.left, bounds.top,
                                             bounds.width(), bounds.height());
-                                    get_embaddings(cropped, imagetype);
+                                    get_embaddings(cropped, imagetype,imageIndex);
                                 }
                             }
 
@@ -129,7 +126,7 @@ public class FaceReconImp implements FaceRecon {
     }
 
     @Override
-    synchronized public void get_embaddings(Bitmap bitmap, String imagetype) {
+    synchronized public void get_embaddings(Bitmap bitmap, String imagetype,int imageIndex) {
         test_embedding = new float[1][128];
         TensorImage inputImageBuffer;
         float[][] embedding = new float[1][128];
@@ -149,27 +146,50 @@ public class FaceReconImp implements FaceRecon {
         tflite.run(inputImageBuffer.getBuffer(), embedding);
 
         if (imagetype.equals("original"))
-            ori_embedding = embedding;
+        {    ori_embedding = embedding;
+            Log.v("val-imageIndex = ", imageIndex + "");
+        }
         else if (imagetype.equals("test")) {
             test_embedding = embedding;
             double val = calculate_distance(ori_embedding, test_embedding);
             Log.v("val-value = ", val + "");
+            Log.v("val-imageIndex = ", imageIndex + "");
             if (previousDistance == 0.0) {
                 previousDistance = val;
-                previousBitmap = bitmap;
+                //previousBitmap = bitmap;
+                matchingIndex = imageIndex;
             }
             if (previousDistance >= val) {
                 previousDistance = val;
-                if (previousDistance < 6.0) {
-                    ModelClass.imageView.setImageBitmap(bitmap);
-                    noOfMatchImage++;
+                matchingIndex = imageIndex;
+               /* if (previousDistance < 6.0) {
+
+                   // ModelClass.imageView.setImageBitmap(bitmap);
+                    ///noOfMatchImage++;
                 } else {
-                    ModelClass.imageView.setImageBitmap(null);
+                    //ModelClass.imageView.setImageBitmap(null);
                     if (noOfMatchImage == 0) {
-                        Toast.makeText(ModelClass.getActivity().getApplicationContext(),
-                                "No matches found!!", Toast.LENGTH_LONG).show();
+                       // Toast.makeText(ModelClass.getActivity().getApplicationContext(),
+                                //"No matches found!!", Toast.LENGTH_LONG).show();
                     }
+                }*/
+            }
+
+            if(imageIndex == FaceReconAPI.userDetails.size()-1){
+                Log.v("val- = ", "Found Match with " +matchingIndex);
+                if(previousDistance < 6.0){
+                    ModelClass.imageView.setImageBitmap(FaceReconAPI.userDetails.get(matchingIndex).getUserImage());
+                    Assistant.matched = 1;
+                    Log.v("val- ", "Welcome "+FaceReconAPI.userDetails.get(matchingIndex).getName());
+                } else {
+                    Assistant.matched = 0;
+                    ModelClass.imageView.setImageBitmap(null);
+                    Toast.makeText(ModelClass.getActivity().getApplicationContext(),
+                            "No matches found!!", Toast.LENGTH_LONG).show();
                 }
+                new Assistant().startAssistant();
+                //start camera again
+                //CameraAPI.getCameraAPI().captureImage(5000);
             }
             Log.v("val-preDistInit = ", previousDistance + "");
         }
@@ -207,4 +227,7 @@ public class FaceReconImp implements FaceRecon {
         this.previousDistance = previousDistance;
     }
 
+    public void setMatchingIndex(int matchingIndex) {
+        this.matchingIndex = matchingIndex;
+    }
 }
