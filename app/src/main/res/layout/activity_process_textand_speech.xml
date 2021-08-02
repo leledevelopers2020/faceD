@@ -1,47 +1,142 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".processTextandSpeech">
+    tools:context=".processTextandSpeech"
+    android:background="@drawable/background_grad">
+
+    <RelativeLayout
+        android:id="@+id/UserInteractionLayout"
+        android:layout_width="200dp"
+        android:layout_height="150dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="60dp"
+        android:layout_marginBottom="50dp"
+        android:layout_toStartOf="@+id/companyLogo"
+        android:background="@color/white">
+
+        <TextView
+            android:id="@+id/speakORwait"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:text="Do not Speak!!"
+            android:layout_centerHorizontal="true"
+            android:textSize="20dp"/>
+
+        <TextView
+            android:id="@+id/speechToText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/speakORwait"
+            android:layout_marginTop="24dp"
+            android:paddingStart="10dp"
+            android:text="You Spoke: INDIA is the best country."
+            android:textColor="@color/black"
+            android:textSize="20dp" />
+
+        <TextView
+            android:id="@+id/feedback"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/speechToText"
+            android:layout_marginTop="25dp"
+            android:textColor="@color/black"
+            android:text="We are here to serve you anytime"
+            android:paddingStart="10dp"
+            android:textSize="20dp"/>
+    </RelativeLayout>
+
+
+
+
+    <RelativeLayout
+        android:id="@+id/slideshowLayout"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_below="@+id/UserInteractionLayout"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="60dp"
+        android:layout_marginBottom="50dp"
+        android:layout_toStartOf="@+id/userDetails">
+
+        <com.smarteist.autoimageslider.SliderView
+            android:id="@+id/slideshow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/slide2"
+            app:sliderAnimationDuration="600"
+            app:sliderAutoCycleDirection="back_and_forth"
+            app:sliderAutoCycleEnabled="true"
+            app:sliderIndicatorAnimationDuration="600"
+            app:sliderIndicatorGravity="center_horizontal|bottom"
+            app:sliderIndicatorOrientation="horizontal"
+            app:sliderIndicatorPadding="3dp"
+            app:sliderIndicatorSelectedColor="@color/black"
+            app:sliderStartAutoCycle="true"
+            android:layout_centerInParent="true"
+            app:sliderIndicatorEnabled="true"
+            app:sliderIndicatorRadius="2dp"
+            app:sliderIndicatorUnselectedColor="#FFF"
+            app:sliderScrollTimeInSec="1"/>
+
+
+    </RelativeLayout>
+
 
     <ImageView
-        android:id="@+id/testImage"
-        android:layout_width="match_parent"
-        android:layout_height="250dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        android:id="@+id/companyLogo"
+        android:layout_width="200dp"
+        android:layout_height="150dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginStart="20dp"
+        android:background="@drawable/logofullwhite" />
 
-    <TextView
-        android:id="@+id/name"
-        android:layout_width="match_parent"
+    <RelativeLayout
+        android:id="@+id/userDetails"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/testImage"
-        app:layout_constraintVertical_bias="0.116"
-        tools:layout_editor_absoluteX="-16dp" />
+        android:layout_below="@+id/companyLogo"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="50dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="50dp"
+        android:padding="3dp">
 
-    <TextView
-        android:id="@+id/phnNumber"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/name"
-        app:layout_constraintVertical_bias="0.061"
-        tools:layout_editor_absoluteX="0dp" />
+        <TextView
+            android:id="@+id/welcomeMessgae"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:text="!! Welcome Guest !!"
+            android:layout_centerHorizontal="true"
+            android:textSize="20dp"/>
 
-    <TextView
-        android:id="@+id/excel"
-        android:layout_width="match_parent"
-        android:layout_height="250dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/phnNumber"
-        app:layout_constraintVertical_bias="0.182" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <ImageView
+            android:id="@+id/userImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/welcomeMessgae"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/black" />
+    </RelativeLayout>
+</RelativeLayout>

@@ -2,7 +2,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:theme="@style/Theme.AppCompat.Light"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
@@ -28,5 +27,5 @@
         android:layout_marginTop="512dp"
         android:layout_marginEnd="19dp"
         android:layout_marginBottom="14dp"
-        android:visibility="invisible" />
+        android:visibility="visible" />
 </RelativeLayout>

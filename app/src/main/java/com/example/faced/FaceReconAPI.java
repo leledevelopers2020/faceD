@@ -1,5 +1,8 @@
 package com.example.faced;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
@@ -268,8 +271,18 @@ public class FaceReconAPI {
         return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
     }
 
-    public void doYouWantToRegister(){
-        new Assistant().startAssistant();
+    public void doYouWantToRegister(Bitmap bitmap){
+        //new Assistant().startAssistant();
+        Log.v("info","Start doYouWantToRegister");
+        processTextandSpeech textandSpeech = new processTextandSpeech();
+        textandSpeech.stepByStep = 1;
+        Context context = ModelClass.getActivity().getApplicationContext();
+        Intent intent = new Intent(context,processTextandSpeech.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        ModelClass.capturedBitmap = bitmap;
+        context.startActivity(intent);
+        Log.v("info","end doYouWantToRegister");
+
     }
 
 }

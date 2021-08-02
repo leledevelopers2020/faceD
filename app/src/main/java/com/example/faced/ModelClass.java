@@ -1,6 +1,7 @@
 package com.example.faced;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -11,6 +12,7 @@ public class ModelClass {
     static private List<File> listFile;
     static Activity activity;
     static ImageView imageView;
+    static Bitmap capturedBitmap;
 
     public static List<File> getListFile() {
         return listFile;

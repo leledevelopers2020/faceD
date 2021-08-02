@@ -39,7 +39,8 @@ public class FaceReconImp implements FaceRecon {
     private Context context;
     private static final float IMAGE_MEAN = 0.0f;
     private static final float IMAGE_STD = 1.0f;
-    public Bitmap cropped;
+    public Bitmap cropped,originalBitmap;
+
     static float[][] ori_embedding = null;
     float[][] test_embedding = null;
     private double previousDistance = 0.0;
@@ -74,6 +75,11 @@ public class FaceReconImp implements FaceRecon {
     @Override
     synchronized public void face_detector(Bitmap bitmap, String imagetype,int imageIndex) {
         Log.v("val type = ", "image type bit" + bitmap);
+        if(imagetype.equals("original"))
+        {
+            originalBitmap = bitmap;
+        }
+
         InputImage image = null;
         try {
             image = InputImage.fromBitmap(bitmap, 0);
@@ -179,15 +185,22 @@ public class FaceReconImp implements FaceRecon {
                 Log.v("val- = ", "Found Match with " +matchingIndex);
                 if(previousDistance < 6.0){
                     ModelClass.imageView.setImageBitmap(FaceReconAPI.userDetails.get(matchingIndex).getUserImage());
-                    Assistant.matched = 1;
+                    processTextandSpeech.matched = 1;
                     Log.v("val- ", "Welcome "+FaceReconAPI.userDetails.get(matchingIndex).getName());
                 } else {
-                    Assistant.matched = 0;
+                    processTextandSpeech.matched = 0;
                     ModelClass.imageView.setImageBitmap(null);
                     Toast.makeText(ModelClass.getActivity().getApplicationContext(),
                             "No matches found!!", Toast.LENGTH_LONG).show();
                 }
-                new Assistant().startAssistant();
+                //new Assistant().startAssistant();
+                Context context = ModelClass.getActivity().getApplicationContext();
+                Intent intent = new Intent(context,processTextandSpeech.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Bitmap sndBit = Bitmap.createScaledBitmap(originalBitmap,200,400,false);
+                ModelClass.capturedBitmap = sndBit;
+                //intent.putExtra("capturedImage",sndBit);
+                context.startActivity(intent);
                 //start camera again
                 //CameraAPI.getCameraAPI().captureImage(5000);
             }
